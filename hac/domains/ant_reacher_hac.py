@@ -5,11 +5,9 @@ import gym
 from gym import spaces
 from pathlib import Path
 from gym.utils import seeding
-import gin
 
 ASSETS_PATH = Path(__file__).resolve().parent / 'assets'
 
-@gin.configurable
 class AntEnv(gym.Env):
 
     def __init__(self, obs_type='coodinate', args=None, seed=None, num_frames_skip=15, show=False):

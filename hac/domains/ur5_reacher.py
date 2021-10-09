@@ -29,7 +29,7 @@ class Ur5Env(gym.Env):
         initial_state_space = np.concatenate((initial_joint_ranges,np.zeros((len(initial_joint_ranges),2))),0)
 
         angle_threshold = np.deg2rad(10)
-        self.end_goal_thresholds = np.array([angle_threshold, angle_threshold, angle_threshold])
+        self.endgoal_thresholds = np.array([angle_threshold, angle_threshold, angle_threshold])
 
         self.project_state_to_end_goal = lambda sim, state: np.array([ur5_bound_angle(sim.data.qpos[i]) for i in range(len(sim.data.qpos))])
 
@@ -189,7 +189,7 @@ class Ur5Env(gym.Env):
         # Check if the gripper is within the goal achievement threshold
         goal_achieved = True
         for i in range(len(hindsight_goal)):
-            if np.absolute(self.target_pos[i] - hindsight_goal[i]) > self.end_goal_thresholds[i]:
+            if np.absolute(self.target_pos[i] - hindsight_goal[i]) > self.endgoal_thresholds[i]:
                 goal_achieved = False
                 break
 

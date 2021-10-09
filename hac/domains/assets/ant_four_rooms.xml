@@ -69,29 +69,48 @@
     </body>
 
     <!-- Create Barriers -->
-    <body name="east_wall" pos="12 0 0.4">
-      <geom type="box" size="0.25 12 0.4" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    <body name="east_wall" pos="8.25 0 1">
+      <geom type="box" size="0.25 8.25 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
     </body>
-    <body name="north_wall" pos="0 12 0.4">
-      <geom type="box" size="12.25 0.25 0.4" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    <body name="north_wall" pos="0 8.25 1">
+      <geom type="box" size="8.5 0.25 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
     </body>
-    <body name="west_wall" pos="-12 0 0.4">
-      <geom type="box" size="0.25 12 0.4" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    <body name="west_wall" pos="-8.25 0 1">
+      <geom type="box" size="0.25 8.25 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
     </body>
-    <body name="south_wall" pos="0 -12 0.4">
-      <geom type="box" size="12.25 0.25 0.4" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    <body name="south_wall" pos="0 -8.25 1">
+      <geom type="box" size="8.5 0.25 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    </body>
+
+    <body name="center_vertical" pos="0 0 1">
+      <geom type="box" size="0.5 3.5 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    </body>
+    <body name="center_horizontal" pos="0 0 1">
+      <geom type="box" size="3.5 0.5 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    </body>
+    <body name="east_stick_out" pos="7.25 0 1">
+      <geom type="box" size="0.75 0.5 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    </body>
+    <body name="north_stick_out" pos="0 7.25 1">
+      <geom type="box" size="0.5 0.75 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    </body>
+    <body name="west_stick_out" pos="-7.25 0 1">
+      <geom type="box" size="0.75 0.5 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
+    </body>
+    <body name="south_stick_out" pos="0 -7.25 1">
+      <geom type="box" size="0.5 0.75 1" contype="1" conaffinity="1" rgba="0.4 0.4 0.4 1" />
     </body>
 
     <!-- Create goal and subgoal visualizations -->
     <body name="goal_platform" pos="0 0 0.4" mocap="true">
-				<site type="sphere" size="0.5" rgba="1 1 0 1" />
+				<site type="box" size="0.4 0.4 0.2" rgba="1 1 0 1" />
 		</body>
 
     <body name="subgoal_0" pos="0 0 0.4" mocap="true">
-				<site type="sphere" size="0.5" rgba="1 0 1 0" />
+				<site type="box" size="0.4 0.4 0.2" rgba="1 0 1 0" />
 		</body>
     <body name="subgoal_1" pos="0 0 0.4" mocap="true">
-				<site type="sphere" size="0.5" rgba="0 1 0 0" />
+				<site type="box" size="0.4 0.4 0.2" rgba="0 1 0 0" />
 		</body>
 
     <!-- Create goal and subgoal visualizations >
@@ -108,13 +127,13 @@
 
   </worldbody>
   <actuator>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_4" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_4" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_1" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_1" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_2" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_2" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_3" gear="16"/>
-    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_3" gear="16"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_4" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_4" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_1" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_1" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_2" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_2" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_3" gear="15"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_3" gear="15"/>
   </actuator>
 </mujoco>
