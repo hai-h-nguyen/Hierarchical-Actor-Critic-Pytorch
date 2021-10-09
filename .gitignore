@@ -5,3 +5,4 @@ wandb/
 models/
 results/
 .DS_Store
+hac.egg-info/
