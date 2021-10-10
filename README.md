@@ -9,8 +9,11 @@ This is the repo that reproduce the results for continuous control domains prese
 
 ### Visualizing the policy saved at results/logs/hac-inverted-pendulum-v0/2-levels/0
 ```python3 run_hac.py --n_layers 2 --env hac-inverted-pendulum-v0 --test --show --timesteps 2000000 --seed 0 --group 2-level```
+- Inverted-Pendulum
+![pendulum](./media/pendulum-3-levels.gif)
 
 ### Learning Curves (Logged by Wandb)
 - Inverted-Pendulum
+![pendulum](./media/3-level-pendulum.png)
 
 ### Saved policies are stored in saved_policies/

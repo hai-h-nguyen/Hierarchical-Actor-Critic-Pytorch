@@ -34,8 +34,6 @@ class InvertedPendulumEnv(gym.Env):
 
         self.max_actions = max_actions
 
-        num_frames_skip = num_frames_skip
-
         model_name = "pendulum.xml"
 
         initial_state_space = np.array([[np.pi/4, 7*np.pi/4],[-0.05,0.05]])
@@ -109,10 +107,6 @@ class InvertedPendulumEnv(gym.Env):
         self.num_frames_skip = num_frames_skip
 
         self.endgoal_dim = len(self.goal_space_test)
-
-        self.steps_cnt = 0
-        self.solved = False
-        self.done = False
 
         self.seed(seed)
 

@@ -158,10 +158,6 @@ class AntEnv(gym.Env):
         self.priest_pos = [5.25, -5.75]
         self.radius = 1.9
 
-        self.steps_cnt = 0
-        self.solved = False
-        self.done = False
-
         self.seed(seed)
 
     def get_next_goal(self, test):
@@ -197,10 +193,6 @@ class AntEnv(gym.Env):
 
     # Reset simulation to state within initial state specified by user
     def reset(self):
-
-        self.steps_cnt = 0
-        self.done = False
-        self.solved = False
 
         # Reset controls
         self.sim.data.ctrl[:] = 0
@@ -259,10 +251,7 @@ class AntEnv(gym.Env):
         else:
             reveal_heaven_pos = False
 
-        self.done = (reward > 0.0)
-        self.solved = (reward > 0.0)
-
-        return self.get_state(reveal_heaven_pos), reward, False, {}
+        return self.get_state(reveal_heaven_pos), 0.0, False, {}
 
 
     # Visualize all subgoals
