@@ -45,8 +45,6 @@ class InvertedPendulumEnv(gym.Env):
         self.project_state_to_endgoal = lambda sim, state: np.array([bound_angle(sim.data.qpos[0]), 15 if state[2] > 15 else -15 if state[2] < -15 else state[2]])
         self.project_state_to_subgoal = lambda sim, state: np.array([bound_angle(sim.data.qpos[0]), 15 if state[2] > 15 else -15 if state[2] < -15 else state[2]])
 
-        endgoal_thresholds = np.array([np.deg2rad(9.5), 0.6])
-
         subgoal_bounds = np.array([[-np.pi,np.pi],[-15,15]])
 
         # Configs for agent
@@ -108,6 +106,8 @@ class InvertedPendulumEnv(gym.Env):
 
         self.endgoal_dim = len(self.goal_space_test)
 
+        self.steps_cnt = 0
+
         self.seed(seed)
 
     def get_next_goal(self, test):
@@ -133,8 +133,6 @@ class InvertedPendulumEnv(gym.Env):
     def reset(self):
 
         self.steps_cnt = 0
-        self.done = False
-        self.solved = False
 
         # Reset controls
         self.sim.data.ctrl[:] = 0
@@ -153,6 +151,8 @@ class InvertedPendulumEnv(gym.Env):
 
     # Execute low-level action for number of frames specified by num_frames_skip
     def step(self, action):
+
+        self.steps_cnt += 1
 
         self.sim.data.ctrl[:] = action
         for _ in range(self.num_frames_skip):
