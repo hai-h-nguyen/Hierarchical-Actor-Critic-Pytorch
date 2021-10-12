@@ -12,9 +12,16 @@ This is the repo that reproduce the results for continuous control domains prese
 - Inverted-Pendulum
 
 ![pendulum](./media/pendulum-3-levels.gif)
+- Mountain-Car-2-levels
 
+![car-2](./media/car-2-levels.gif)
+- Mountain-Car-3-levels
+
+![car-3](./media/car-3-levels.gif)
 ### Learning Curves (Logged by Wandb)
 - Inverted-Pendulum
 ![pendulum](./media/3-level-pendulum.png)
+- Mountain-Car
+![car](./media/car.png)
 
 ### Saved policies are stored in saved_policies/

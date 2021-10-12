@@ -22,7 +22,11 @@ import time
 import gym
 from gym import spaces
 from gym.utils import seeding
-from gym.envs.classic_control import rendering as visualize
+
+try:
+    from gym.envs.classic_control import rendering as visualize
+except:
+    pass
 
 class MountainCarEnv(gym.Env):
     metadata = {
