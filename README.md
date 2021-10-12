@@ -1,4 +1,4 @@
-This is the repo that reproduce the results for continuous control domains presented in the paper "Learning Multi-Level Hierarchies with Hindsight" (ICLR 2019) in Pytorch. Original repo in Tensorflow is at https://github.com/andrew-j-levy/Hierarchical-Actor-Critc-HAC-. The repo is inspired from "https://github.com/nikhilbarhate99/Hierarchical-Actor-Critic-HAC-PyTorch". The difference is that I use the domains (Ant-Four-Room, Ant-Reacher, UR5-Reacher, Inverted-Pendulum) in the original paper, while the other repo does not (it uses two custom and simpler domains).
+This is the repo that reproduce the results for continuous control domains presented in the paper "Learning Multi-Level Hierarchies with Hindsight" (ICLR 2019) in Pytorch. Original repo in Tensorflow is at https://github.com/andrew-j-levy/Hierarchical-Actor-Critc-HAC-. The repo is inspired from "https://github.com/nikhilbarhate99/Hierarchical-Actor-Critic-HAC-PyTorch". The difference is that I use the domains (Ant-Four-Room, Ant-Reacher, UR5-Reacher, Inverted-Pendulum) in the original paper, while the other repo does not (it uses two custom and simpler domains - one of them is included in this repo as well).
 
 ### Setup
 - Install `pip3 install -e .`
@@ -14,16 +14,13 @@ This is the repo that reproduce the results for continuous control domains prese
 <p align="center">
   <img src="./media/pendulum-3-levels.gif" height="200" />
 </p>
-- Mountain-Car-2-levels
+- Mountain-Car (2 and 3 levels)
 <p align="center">
   <img src="./media/car-2-levels.gif" height="200" />
-</p>
-- Mountain-Car-3-levels
-<p align="center">
   <img src="./media/car-3-levels.gif" height="200" />
 </p>
 
-### Learning Curves (Logged by Wandb)
+### Learning Curves (logged by wandb)
 - Inverted-Pendulum
 
 <p align="center">

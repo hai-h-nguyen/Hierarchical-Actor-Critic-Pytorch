@@ -6,9 +6,10 @@ from gym import spaces
 from pathlib import Path
 from gym.utils import seeding
 
+
 ASSETS_PATH = Path(__file__).resolve().parent / 'assets'
 
-def ur5_bound_angle(angle):
+def bound_angle_ur5(angle):
 
     bounded_angle = np.absolute(angle) % (2*np.pi)
     if angle < 0:
@@ -16,94 +17,171 @@ def ur5_bound_angle(angle):
 
     return bounded_angle
 
-class Ur5Env(gym.Env):
 
-    def __init__(self, seed=None, num_frames_skip=15, rendering=False):
+class UR5Env(gym.Env):
 
-        model_name = "ur5_reacher.xml"
+    def __init__(self, args, seed, max_actions=1200, num_frames_skip=10, show=False):
 
+        #################### START CONFIGS #######################
+        if args.n_layers in [1]:
+            args.time_scale = 600
+            max_actions = 600
+        elif args.n_layers in [2]:
+            args.time_scale = 25
+            max_actions = 600
+        elif args.n_layers in [3]:
+            args.time_scale = 10
+            max_actions = args.time_scale**(args.n_layers-1)*6
+
+        timesteps_per_action = 15
+        num_frames_skip = timesteps_per_action
+
+        model_name = "ur5.xml"
         initial_joint_pos = np.array([  5.96625837e-03,   3.22757851e-03,  -1.27944547e-01])
         initial_joint_pos = np.reshape(initial_joint_pos,(len(initial_joint_pos),1))
         initial_joint_ranges = np.concatenate((initial_joint_pos,initial_joint_pos),1)
         initial_joint_ranges[0] = np.array([-np.pi/8,np.pi/8])
+
         initial_state_space = np.concatenate((initial_joint_ranges,np.zeros((len(initial_joint_ranges),2))),0)
+        goal_space_train = [[-np.pi,np.pi],[-np.pi/4,0],[-np.pi/4,np.pi/4]]
+        goal_space_test = [[-np.pi,np.pi],[-np.pi/4,0],[-np.pi/4,np.pi/4]]
 
+
+        project_state_to_endgoal = lambda sim, state: np.array([bound_angle_ur5(sim.data.qpos[i]) for i in range(len(sim.data.qpos))])
         angle_threshold = np.deg2rad(10)
-        self.endgoal_thresholds = np.array([angle_threshold, angle_threshold, angle_threshold])
+        endgoal_thresholds = np.array([angle_threshold, angle_threshold, angle_threshold])
 
-        self.project_state_to_end_goal = lambda sim, state: np.array([ur5_bound_angle(sim.data.qpos[i]) for i in range(len(sim.data.qpos))])
+        subgoal_bounds = np.array([[-2*np.pi,2*np.pi],[-2*np.pi,2*np.pi],[-2*np.pi,2*np.pi],[-4,4],[-4,4],[-4,4]])
+        project_state_to_subgoal = lambda sim, state: np.concatenate((np.array([bound_angle_ur5(sim.data.qpos[i]) for i in range(len(sim.data.qpos))]),
+                                    np.array([4 if sim.data.qvel[i] > 4 else -4 if sim.data.qvel[i] < -4 else sim.data.qvel[i] for i in range(len(sim.data.qvel))])))
 
-        switch_angle_threshold = np.deg2rad(10)
-        self.switch_thresholds = np.array([switch_angle_threshold, switch_angle_threshold, switch_angle_threshold])
+        velo_threshold = 2
+        subgoal_thresholds = np.concatenate((np.array([angle_threshold for i in range(3)]), np.array([velo_threshold for i in range(3)])))
 
-        self.goal_space_test = [[-np.pi, np.pi], [-np.pi/4, 0], [-np.pi/4, np.pi/4]]
-        self.action_scale = np.array([np.pi, np.pi/8, np.pi/4])
-        self.action_offset = np.array([0.0, -np.pi/8, 0.0])
+        # Configs for agent
+        agent_params = {}
+        agent_params["subgoal_test_perc"] = 0.3
+        agent_params["random_action_perc"] = 0.2
+        agent_params["subgoal_penalty"] = -args.time_scale
+        agent_params["atomic_noise"] = [0.1 for i in range(3)]
+        agent_params["subgoal_noise"] = [0.03 for i in range(6)]
+        agent_params["episodes_to_store"] = 500
+        agent_params["num_exploration_episodes"] = 50
+        agent_params["num_pre_training_episodes"] = -1
 
-        MODEL_PATH = ASSETS_PATH / model_name
+        #################### END CONFIGS #######################
+
+        self.seed(seed)
+
+        self.agent_params = agent_params
+
+        self.name = model_name
+
+        MODEL_PATH = ASSETS_PATH / self.name
 
         # Create Mujoco Simulation
         self.model = load_model_from_path(str(MODEL_PATH))
         self.sim = MjSim(self.model)
 
         # Set dimensions and ranges of states, actions, and goals in order to configure actor/critic networks
-        self.obs_dim = len(self.sim.data.qpos) + 3 # State will include (i) joint angles and coordinate of the target position
-        self.action_dim = 3 # desired angles for 3 joints
+        if model_name == "pendulum.xml":
+            self.state_dim = 2*len(self.sim.data.qpos) + len(self.sim.data.qvel)
+        else:
+            self.state_dim = len(self.sim.data.qpos) + len(self.sim.data.qvel) # State will include (i) joint angles and (ii) joint velocities
+        self.action_dim = len(self.sim.model.actuator_ctrlrange) # low-level action dim
+        self.action_bounds = self.sim.model.actuator_ctrlrange[:,1] # low-level action bounds
+        self.action_offset = np.zeros((len(self.action_bounds))) # Assumes symmetric low-level action ranges
+        self.endgoal_dim = len(goal_space_test)
+        self.subgoal_dim = len(subgoal_bounds)
+        self.subgoal_bounds = subgoal_bounds
 
-        self.switch_pos = [0.0, 0.0, -np.pi/4]
+        # Projection functions
+        self.project_state_to_endgoal = project_state_to_endgoal
+        self.project_state_to_subgoal = project_state_to_subgoal
+
+
+        # Convert subgoal bounds to symmetric bounds and offset.  Need these to properly configure subgoal actor networks
+        self.subgoal_bounds_symmetric = np.zeros((len(self.subgoal_bounds)))
+        self.subgoal_bounds_offset = np.zeros((len(self.subgoal_bounds)))
+
+        for i in range(len(self.subgoal_bounds)):
+            self.subgoal_bounds_symmetric[i] = (self.subgoal_bounds[i][1] - self.subgoal_bounds[i][0])/2
+            self.subgoal_bounds_offset[i] = self.subgoal_bounds[i][1] - self.subgoal_bounds_symmetric[i]
+
+
+        # End goal/subgoal thresholds
+        self.endgoal_thresholds = endgoal_thresholds
+        self.subgoal_thresholds = subgoal_thresholds
 
         # Set inital state and goal state spaces
         self.initial_state_space = initial_state_space
+        self.goal_space_train = goal_space_train
+        self.goal_space_test = goal_space_test
         self.subgoal_colors = ["Magenta","Green","Red","Blue","Cyan","Orange","Maroon","Gray","White","Black"]
 
+        self.max_actions = max_actions
+
         # Implement visualization if necessary
-        self.visualize = rendering  # Visualization boolean
+        self.visualize = show  # Visualization boolean
         if self.visualize:
             self.viewer = MjViewer(self.sim)
         self.num_frames_skip = num_frames_skip
 
-        # For Gym interface
-        self.action_space = spaces.Box(
-            low=-1,
-            high=1,
-            shape=(self.action_dim,),
-            dtype=np.float32
-        )
-
-        self.observation_space = spaces.Box(
-            low=-np.inf,
-            high=np.inf,
-            shape=(self.obs_dim,),
-            dtype=np.float32            
-        )
-
-        self.near_switch_timestamp = -1
         self.steps_cnt = 0
-        self.target_visible_duration = 10 # number of timestep that the target is visible to the agent (after the switch is turned on)
-
-        self.seed(seed)
-
-    def _scale_action(self, action):
-        return action * self.action_scale + self.action_offset
-
+        
     # Get state, which concatenates joint positions and velocities
-    def get_state(self, target_pos):
-        return np.concatenate((self.sim.data.qpos, target_pos))
+    def get_state(self):
+        return np.concatenate((self.sim.data.qpos, self.sim.data.qvel))
 
     # Reset simulation to state within initial state specified by user
     def reset(self):
 
         self.steps_cnt = 0
-        self.near_switch_timestamp = -1
+
+        # Reset joint positions and velocities
+        for i in range(len(self.sim.data.qpos)):
+            self.sim.data.qpos[i] = self.np_random.uniform(self.initial_state_space[i][0],self.initial_state_space[i][1])
+
+        for i in range(len(self.sim.data.qvel)):
+            self.sim.data.qvel[i] = self.np_random.uniform(self.initial_state_space[len(self.sim.data.qpos) + i][0],self.initial_state_space[len(self.sim.data.qpos) + i][1])
+
+        self.sim.step()
+
+        # Return state
+        return self.get_state()
+
+    # Execute low-level action for number of frames specified by num_frames_skip
+    def step(self, action):
+
+        self.steps_cnt += 1
+
+        self.sim.data.ctrl[:] = action
+        for _ in range(self.num_frames_skip):
+            self.sim.step()
+            if self.visualize:
+                self.viewer.render()
+
+        return self.get_state(), 0.0, False, {}
+
+
+    # Visualize end goal.  This function may need to be adjusted for new environments.
+    def display_end_goal(self, end_goal):
+
+        joint_pos = self._angles2jointpos(end_goal[:3])
+
+        for i in range(3):
+            self.sim.data.mocap_pos[i] = joint_pos[i]
+
+    def get_next_goal(self, test):
 
         goal_possible = False
-        while not goal_possible:
-            end_goal = np.zeros(shape=(3,))
-            end_goal[0] = self.np_random.uniform(self.goal_space_test[0][0], self.goal_space_test[0][1])
-            end_goal[1] = self.np_random.uniform(self.goal_space_test[1][0], self.goal_space_test[1][1])
-            end_goal[2] = self.np_random.uniform(self.goal_space_test[2][0], self.goal_space_test[2][1])
 
-            # Next need to ensure chosen joint angles result in achievable task (i.e., desired end effector position is above ground)
+        while not goal_possible:
+            end_goal = np.zeros(shape=(self.endgoal_dim,))
+
+            end_goal[0] = np.random.uniform(self.goal_space_test[0][0],self.goal_space_test[0][1])
+            end_goal[1] = np.random.uniform(self.goal_space_test[1][0],self.goal_space_test[1][1])
+            end_goal[2] = np.random.uniform(self.goal_space_test[2][0],self.goal_space_test[2][1])
 
             theta_1 = end_goal[0]
             theta_2 = end_goal[1]
@@ -133,89 +211,29 @@ class Ur5Env(gym.Env):
             if np.absolute(end_goal[0]) > np.pi/4 and forearm_pos[2] > 0.05 and wrist_1_pos[2] > 0.15:
                 goal_possible = True
 
-        self.target_pos = end_goal
+        self.display_end_goal(end_goal)
 
-        # Set initial joint positions and velocities
-        for i in range(len(self.sim.data.qpos)):
-            self.sim.data.qpos[i] = np.random.uniform(self.initial_state_space[i][0],self.initial_state_space[i][1])
+        return end_goal
 
-        for i in range(len(self.sim.data.qvel)):
-            self.sim.data.qvel[i] = np.random.uniform(self.initial_state_space[len(self.sim.data.qpos) + i][0],self.initial_state_space[len(self.sim.data.qpos) + i][1])
+    # Visualize all subgoals
+    def display_subgoals(self,subgoals):
 
-        self.sim.step()
-
-        # Not reveal the target info at reset
-        return self.get_state(np.zeros_like(self.target_pos))
-
-    # Execute low-level action for number of frames specified by num_frames_skip
-    def step(self, action):
-
-        self.steps_cnt += 1
-
-        desired_angles = self._scale_action(action)
-
-        if self.visualize:
-            self.display_action(desired_angles)
-            self.display_target_pos()
-            self.display_switch()
-
-        # Set the joint angles to the desired ones
-        self.sim.data.qpos[:] = desired_angles
-        self.sim.data.qvel[:] = np.zeros(shape=(3, ))
-
-        self.sim.step()
-        if self.visualize:
-            self.viewer.render()
-
-        hindsight_goal = self.project_state_to_end_goal(self.sim, False)
-
-        # Check if the gripper is within the switch area
-        near_switch = True
-        for i in range(len(hindsight_goal)):
-            if np.absolute(self.switch_pos[i] - hindsight_goal[i]) > self.switch_thresholds[i]:
-                near_switch = False
-                break
-
-        # Near the switch, record the timestamp
-        if near_switch:
-            self.near_switch_timestamp = self.steps_cnt
-
-        # If the switch is turned on, let the agent see the target for a number of timesteps
-        if self.near_switch_timestamp > 0 and (self.steps_cnt - self.near_switch_timestamp) <= self.target_visible_duration:
-            target_pos = np.copy(self.target_pos)
+        # Display up to 10 subgoals and end goal
+        if len(subgoals) <= 11:
+            subgoal_ind = 0
         else:
-            target_pos = np.zeros_like(self.target_pos)
-            
-        # Check if the gripper is within the goal achievement threshold
-        goal_achieved = True
-        for i in range(len(hindsight_goal)):
-            if np.absolute(self.target_pos[i] - hindsight_goal[i]) > self.endgoal_thresholds[i]:
-                goal_achieved = False
-                break
+            subgoal_ind = len(subgoals) - 11
 
-        # Calculate reward
-        reward = 0.0
-        if goal_achieved:
-            reward = 1.0    
+        for i in range(1,min(len(subgoals),11)):
+            angles = subgoals[subgoal_ind][:3]
+            joint_pos = self._angles2jointpos(angles)
 
-        return self.get_state(target_pos), reward, False, {}
+            # Designate site position for upper arm, forearm and wrist
+            for j in range(3):     
+                self.sim.data.mocap_pos[3 + 3*(i-1) + j] = np.copy(joint_pos[j])
+                self.sim.model.site_rgba[3 + 3*(i-1) + j][3] = 1
 
-    def display_action(self, action):
-        joint_pos = self._angles2jointpos(action)
-        for i in range(3):
-            self.sim.data.mocap_pos[i] = joint_pos[i]        
-
-    def display_switch(self):
-        joint_pos = self._angles2jointpos(self.switch_pos)
-
-        for i in range(3):
-            self.sim.data.mocap_pos[3 + i] = joint_pos[i] 
-
-    def display_target_pos(self):
-        joint_pos = self._angles2jointpos(self.target_pos)
-
-        for i in range(3):
-            self.sim.data.mocap_pos[6 + i] = joint_pos[i]
+            subgoal_ind += 1
 
     def seed(self, seed=None):
         self.np_random, seed_ = seeding.np_random(seed)
