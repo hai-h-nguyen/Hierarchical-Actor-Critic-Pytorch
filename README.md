@@ -11,17 +11,29 @@ This is the repo that reproduce the results for continuous control domains prese
 ```python3 run_hac.py --n_layers 2 --env hac-inverted-pendulum-v0 --test --show --timesteps 2000000 --seed 0 --group 2-level```
 - Inverted-Pendulum
 
-![pendulum](./media/pendulum-3-levels.gif)
+<p align="center">
+  <img src="./media/pendulum-3-levels.gif" height="200" />
+</p>
 - Mountain-Car-2-levels
-
-![car-2](./media/car-2-levels.gif)
+<p align="center">
+  <img src="./media/car-2-levels.gif" height="200" />
+</p>
 - Mountain-Car-3-levels
+<p align="center">
+  <img src="./media/car-3-levels.gif" height="200" />
+</p>
 
-![car-3](./media/car-3-levels.gif)
 ### Learning Curves (Logged by Wandb)
 - Inverted-Pendulum
-![pendulum](./media/3-level-pendulum.png)
+
+<p align="center">
+  <img src="./media/3-level-pendulum.png" height="300" />
+</p>
+
 - Mountain-Car
-![car](./media/car.png)
+
+<p align="center">
+  <img src="./media/car.png" height="300"/>
+</p>
 
 ### Saved policies are stored in saved_policies/
