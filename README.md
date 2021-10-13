@@ -19,7 +19,11 @@ This is the repo that reproduce the results for continuous control domains prese
   <img src="./media/car-2-levels.gif" height="200" />
   <img src="./media/car-3-levels.gif" height="200" />
 </p>
-
+- UR5-Reacher (2 and 3 levels)
+<p align="center">
+  <img src="./media/ur5-reacher-2-levels.gif" height="200" />
+  <img src="./media/ur5-reacher-3-levels.gif" height="200" />
+</p>
 ### Learning Curves (logged by wandb)
 - Inverted-Pendulum
 
@@ -31,6 +35,12 @@ This is the repo that reproduce the results for continuous control domains prese
 
 <p align="center">
   <img src="./media/car.png" height="300"/>
+</p>
+
+- UR5-Reacher
+
+<p align="center">
+  <img src="./media/ur5-reacher.png" height="300"/>
 </p>
 
 ### Saved policies are stored in saved_policies/
