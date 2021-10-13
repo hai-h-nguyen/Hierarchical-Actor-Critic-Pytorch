@@ -24,17 +24,17 @@
 # CUDA_VISIBILE_DEVICES=2, python3 run_hac.py --n_layers 2 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 2 --group test-2-level
 # CUDA_VISIBILE_DEVICES=3, python3 run_hac.py --n_layers 2 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 3 --group test-2-level
 
-# CUDA_VISIBLE_DEVICES=0, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 0 --group test-3-level
-# CUDA_VISIBLE_DEVICES=1, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 1 --group test-3-level
-# CUDA_VISIBLE_DEVICES=2, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 2 --group test-3-level
-# CUDA_VISIBLE_DEVICES=3, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 3 --group test-3-level
+# CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 0 --group test-3-level
+# CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 1 --group test-3-level
+# CUDA_VISIBILE_DEVICES=2, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 2 --group test-3-level
+# CUDA_VISIBILE_DEVICES=3, python3 run_hac.py --n_layers 3 --env hac-ur5-reacher-v0 --retrain --timesteps 2000000 --seed 3 --group test-3-level
 
 CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 0 --group test-2-level
 CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 1 --group test-2-level
 CUDA_VISIBILE_DEVICES=2, python3 run_hac.py --n_layers 2 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 2 --group test-2-level
 CUDA_VISIBILE_DEVICES=3, python3 run_hac.py --n_layers 2 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 3 --group test-2-level
 
-CUDA_VISIBLE_DEVICES=0, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 0 --group test-3-level
-CUDA_VISIBLE_DEVICES=1, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 1 --group test-3-level
-CUDA_VISIBLE_DEVICES=2, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 2 --group test-3-level
-CUDA_VISIBLE_DEVICES=3, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 3 --group test-3-level
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 0 --group test-3-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 1 --group test-3-level
+CUDA_VISIBILE_DEVICES=2, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 2 --group test-3-level
+CUDA_VISIBILE_DEVICES=3, python3 run_hac.py --n_layers 3 --env hac-ant-four-rooms-v0 --retrain --timesteps 2000000 --seed 3 --group test-3-level
