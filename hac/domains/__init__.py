@@ -14,3 +14,8 @@ register(
     id='hac-ur5-reacher-v0',
     entry_point='hac.domains.ur5_reacher:UR5Env',
 )
+
+register(
+    id='hac-ant-four-rooms-v0',
+    entry_point='hac.domains.ant_four_rooms:AntFourRoomsEnv',
+)

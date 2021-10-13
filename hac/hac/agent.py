@@ -131,7 +131,12 @@ class Agent():
         logging.info(f"Next End Goal: {self.goal_array[self.args.n_layers - 1]}")
 
         # Select initial state from in initial state space
-        self.current_state = env.reset()
+        if self.args.env in ['hac-ant-four-rooms-v0']:
+            next_goal = self.goal_array[self.args.n_layers - 1]
+        else:
+            next_goal = None
+
+        self.current_state = env.reset(next_goal)
         # print("Initial State: ", self.current_state)
 
         # Reset step counter
