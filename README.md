@@ -9,7 +9,7 @@ This is the repo that reproduce the results for continuous control domains prese
 
 ### Visualizing the policy saved at results/logs/hac-inverted-pendulum-v0/2-levels/0
 ```python3 run_hac.py --n_layers 2 --env hac-inverted-pendulum-v0 --test --show --timesteps 2000000 --seed 0 --group 2-level```
-- Inverted-Pendulum
+- Inverted-Pendulum (3 levels)
 
 <p align="center">
   <img src="./media/pendulum-3-levels.gif" height="200" />
@@ -23,6 +23,16 @@ This is the repo that reproduce the results for continuous control domains prese
 <p align="center">
   <img src="./media/ur5-reacher-2-levels.gif" height="200" />
   <img src="./media/ur5-reacher-3-levels.gif" height="200" />
+</p>
+- Ant-Four-Rooms (2 and 3 levels)
+<p align="center">
+  <img src="./media/ant-four-rooms-2-levels.gif" height="200" />
+  <img src="./media/ant-four-rooms-3-levels.gif" height="200" />
+</p>
+- Ant-Reacher (2 and 3 levels)
+<p align="center">
+  <img src="./media/ant-reacher-2-levels.gif" height="200" />
+  <img src="./media/ant-reacher-3-levels.gif" height="200" />
 </p>
 ### Learning Curves (logged by wandb)
 - Inverted-Pendulum
@@ -43,4 +53,19 @@ This is the repo that reproduce the results for continuous control domains prese
   <img src="./media/ur5-reacher.png" height="300"/>
 </p>
 
+- Ant-Four-Rooms
+
+<p align="center">
+  <img src="./media/ant-four-rooms.png" height="300"/>
+</p>
+
+- Ant-Reacher
+
+<p align="center">
+  <img src="./media/ant-reacher.png" height="300"/>
+</p>
+
 ### Saved policies are stored in saved_policies/
+To replay a saved policy: create a folder results/logs/hac/hac-ant-reacher-v0/2-levels and copy a saved policies into the folder, e.g., copy the whole 0/ folder in saved_policies/ant-reacher-2-levels. Then run the following command (the seed value must also be the name of the folder copied over):
+
+```python3 run_hac.py --n_layers 2 --env hac-ant-reacher-v0 --test --show --timesteps 2000000 --seed 0 --group 2-level```
