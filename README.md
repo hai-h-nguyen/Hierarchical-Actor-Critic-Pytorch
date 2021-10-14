@@ -34,6 +34,7 @@ This is the repo that reproduce the results for continuous control domains prese
   <img src="./media/ant-reacher-2-levels.gif" height="200" />
   <img src="./media/ant-reacher-3-levels.gif" height="200" />
 </p>
+
 ### Learning Curves (logged by wandb)
 - Inverted-Pendulum
 
