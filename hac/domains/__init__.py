@@ -19,3 +19,8 @@ register(
     id='hac-ant-four-rooms-v0',
     entry_point='hac.domains.ant_four_rooms:AntFourRoomsEnv',
 )
+
+register(
+    id='hac-ant-reacher-v0',
+    entry_point='hac.domains.ant_reacher:AntReacherEnv',
+)

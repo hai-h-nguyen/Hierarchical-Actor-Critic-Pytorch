@@ -131,7 +131,7 @@ class Agent():
         logging.info(f"Next End Goal: {self.goal_array[self.args.n_layers - 1]}")
 
         # Select initial state from in initial state space
-        if self.args.env in ['hac-ant-four-rooms-v0']:
+        if self.args.env in ['hac-ant-four-rooms-v0', 'hac-ant-reacher-v0']:
             next_goal = self.goal_array[self.args.n_layers - 1]
         else:
             next_goal = None

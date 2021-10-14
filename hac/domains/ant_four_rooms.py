@@ -156,6 +156,9 @@ class AntFourRoomsEnv(gym.Env):
         elif room_num == 3:
             end_goal[1] *= -1
 
+        # Visualize End Goal
+        self.display_endgoal(end_goal)
+
         return end_goal
 
     # Get state, which concatenates joint positions and velocities
