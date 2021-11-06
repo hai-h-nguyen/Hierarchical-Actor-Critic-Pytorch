@@ -1,0 +1,11 @@
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-car-flag-v0 --retrain --timesteps 200000 --seed 0 --group 2-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-car-flag-v0 --retrain --timesteps 200000 --seed 1 --group 2-level
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-car-flag-v0 --retrain --timesteps 200000 --seed 2 --group 2-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-car-flag-v0 --retrain --timesteps 200000 --seed 3 --group 2-level
+
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-two-boxes-check-v0 --retrain --timesteps 300000 --seed 0 --group 2-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-two-boxes-check-v0 --retrain --timesteps 300000 --seed 1 --group 2-level
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-two-boxes-check-v0 --retrain --timesteps 300000 --seed 2 --group 2-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-two-boxes-check-v0 --retrain --timesteps 300000 --seed 3 --group 2-level
+
+

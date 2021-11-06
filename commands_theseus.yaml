@@ -1,0 +1,9 @@
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-ant-heaven-hell-v0 --retrain --timesteps 20000000 --seed 0 --group test-2-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-ant-heaven-hell-v0 --retrain --timesteps 20000000 --seed 1 --group test-2-level
+CUDA_VISIBILE_DEVICES=2, python3 run_hac.py --n_layers 2 --env hac-ant-heaven-hell-v0 --retrain --timesteps 20000000 --seed 2 --group test-2-level
+CUDA_VISIBILE_DEVICES=3, python3 run_hac.py --n_layers 2 --env hac-ant-heaven-hell-v0 --retrain --timesteps 20000000 --seed 3 --group test-2-level
+
+CUDA_VISIBILE_DEVICES=0, python3 run_hac.py --n_layers 2 --env hac-ant-tag-v0 --retrain --timesteps 20000000 --seed 0 --group test-2-level
+CUDA_VISIBILE_DEVICES=1, python3 run_hac.py --n_layers 2 --env hac-ant-tag-v0 --retrain --timesteps 20000000 --seed 1 --group test-2-level
+CUDA_VISIBILE_DEVICES=2, python3 run_hac.py --n_layers 2 --env hac-ant-tag-v0 --retrain --timesteps 20000000 --seed 2 --group test-2-level
+CUDA_VISIBILE_DEVICES=3, python3 run_hac.py --n_layers 2 --env hac-ant-tag-v0 --retrain --timesteps 20000000 --seed 3 --group test-2-level
