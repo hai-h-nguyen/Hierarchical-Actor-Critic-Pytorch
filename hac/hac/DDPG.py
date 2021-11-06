@@ -37,13 +37,21 @@ class Actor(nn.Module):
         # Dimensions of goal placeholder will differ depending on layer level
         if not self.is_top_layer:
             self.goal_dim = env.subgoal_dim
-        else:
-            self.goal_dim = env.endgoal_dim
 
         self.state_dim = env.state_dim
 
         # actor
-        self.actor = nn.Sequential(
+        if self.is_top_layer:
+            self.actor = nn.Sequential(
+                            nn.Linear(self.state_dim, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, self.action_space_size),
+                            nn.Tanh()
+                            )
+        else:
+            self.actor = nn.Sequential(
                             nn.Linear(self.state_dim + self.goal_dim, 64),
                             nn.ReLU(),
                             nn.Linear(64, 64),
@@ -57,8 +65,11 @@ class Actor(nn.Module):
         self.action_space_bounds = torch.FloatTensor(self.action_space_bounds).to(device)
         self.action_offset = torch.FloatTensor(self.action_offset).to(device)
         
-    def forward(self, state, goal):
-        return self.actor(torch.cat([state, goal], 1)) * self.action_space_bounds + self.action_offset
+    def forward(self, state, goal=None):
+        if self.is_top_layer:
+            return self.actor(state) * self.action_space_bounds + self.action_offset
+        else:
+            return self.actor(torch.cat([state, goal], 1)) * self.action_space_bounds + self.action_offset
         
 class Critic(nn.Module):
     def __init__(self, 
@@ -84,8 +95,6 @@ class Critic(nn.Module):
         # Dimensions of goal placeholder will differ depending on layer level
         if not self.is_top_layer:
             self.goal_dim = env.subgoal_dim
-        else:
-            self.goal_dim = env.endgoal_dim
 
         self.state_dim = env.state_dim
 
@@ -94,19 +103,31 @@ class Critic(nn.Module):
         self.q_offset = -np.log(self.q_limit/self.q_init - 1)
 
         # UVFA critic
-        self.critic = nn.Sequential(
-                        nn.Linear(self.state_dim + self.goal_dim + self.action_dim, 64),
-                        nn.ReLU(),
-                        nn.Linear(64, 64),
-                        nn.ReLU(),
-                        nn.Linear(64, 1),
-                        )            
+        if self.is_top_layer:
+            self.critic = nn.Sequential(
+                            nn.Linear(self.state_dim + self.action_dim, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 1),
+                            )
+        else:
+            self.critic = nn.Sequential(
+                            nn.Linear(self.state_dim + self.goal_dim + self.action_dim, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 1),
+                            )           
 
         self.critic.apply(init_weights)
 
-    def forward(self, state, action, goal):
+    def forward(self, state, action, goal=None):
         # rewards are in range [-H, 0]
-        input_ = torch.cat([state, action, goal], 1)
+        if self.is_top_layer:
+            input_ = torch.cat([state, action], 1)
+        else:
+            input_ = torch.cat([state, action, goal], 1)
         input_ = self.critic(input_)
         return torch.sigmoid(input_ + self.q_offset) * self.q_limit
     
@@ -129,16 +150,24 @@ class DDPG:
 
         
     
-    def select_action(self, state, goal):
+    def select_action(self, state, goal=None):
         state = torch.FloatTensor(state.reshape(1, -1)).to(device)
-        goal = torch.FloatTensor(goal.reshape(1, -1)).to(device)
-        return self.actor(state, goal).detach().cpu().data.numpy().flatten()
+        if self.is_top_layer:
+            assert (goal is None)
+            return self.actor(state).detach().cpu().data.numpy().flatten()
+        else:
+            assert (goal is not None)
+            goal = torch.FloatTensor(goal.reshape(1, -1)).to(device)
+            return self.actor(state, goal).detach().cpu().data.numpy().flatten()
     
     def update(self, buffer):
         
         # Sample a batch of transitions from replay buffer:
-        state, action, reward, next_state, goal, done = buffer.get_batch()
-        goal = torch.FloatTensor(goal).to(device)
+        if self.is_top_layer:
+            state, action, reward, next_state, done = buffer.get_batch()
+        else:
+            state, action, reward, next_state, goal, done = buffer.get_batch()
+            goal = torch.FloatTensor(goal).to(device)
         
         # convert np arrays into tensors
         state = torch.FloatTensor(state).to(device)
@@ -148,22 +177,32 @@ class DDPG:
         done = torch.FloatTensor(done).reshape((-1,1)).to(device)
         
         # select next action
-        next_action = self.actor(next_state, goal).detach()
-        target_Q = self.critic(next_state, next_action, goal).detach()
+        if self.is_top_layer:
+            next_action = self.actor(next_state).detach()
+            target_Q = self.critic(next_state, next_action).detach()
+        else:
+            next_action = self.actor(next_state, goal).detach()
+            target_Q = self.critic(next_state, next_action, goal).detach()
         
         # Compute target Q-value:
         target_Q = reward + ((1-done) * self.gamma * target_Q)
         target_Q = torch.clamp(target_Q, self.q_limit, 0.0)
 
         # Optimize Critic:
-        critic_loss = self.mseLoss(self.critic(state, action, goal), target_Q)
+        if self.is_top_layer:
+            critic_loss = self.mseLoss(self.critic(state, action), target_Q)
+        else:
+            critic_loss = self.mseLoss(self.critic(state, action, goal), target_Q)
         
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()
         
         # Compute actor loss:
-        actor_loss = -self.critic(state, self.actor(state, goal), goal).mean()
+        if self.is_top_layer:
+            actor_loss = -self.critic(state, self.actor(state)).mean()
+        else:
+            actor_loss = -self.critic(state, self.actor(state, goal), goal).mean()
         
         # Optimize the actor
         self.actor_optimizer.zero_grad()

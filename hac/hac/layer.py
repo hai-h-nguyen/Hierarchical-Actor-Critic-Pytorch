@@ -41,7 +41,7 @@ class Layer():
 
         # self.buffer_size = 10000000
         self.batch_size = 1024
-        self.replay_buffer = ExperienceBuffer(self.buffer_size, self.batch_size)
+        self.replay_buffer = ExperienceBuffer(self.buffer_size, self.batch_size, self.is_top_layer)
 
         # Create buffer to store not yet finalized goal replay transitions
         self.temp_goal_replay_storage = []
@@ -138,7 +138,7 @@ class Layer():
 
 
     # Create action replay transition by evaluating hindsight action given original goal
-    def perform_action_replay(self, hindsight_action, next_state, goal_status):
+    def perform_action_replay(self, hindsight_action, next_state, goal_status, env):
 
         # Determine reward (0 if goal achieved, -1 otherwise) and finished boolean.  The finished boolean is used for determining the target for Q-value updates
         if goal_status[self.layer_number]:
@@ -149,9 +149,13 @@ class Layer():
             finished = False
 
         # Transition will take the form [old state, hindsight_action, reward, next_state, goal, terminate boolean, None]
-        transition = [self.current_state, hindsight_action, reward, next_state, self.goal, finished, None]
+        if self.is_top_layer:
+            if env.done and not env.solved:
+                reward = self.subgoal_penalty
+            transition = [self.current_state, hindsight_action, reward, next_state, finished, None]
+        else:
+            transition = [self.current_state, hindsight_action, reward, next_state, self.goal, finished, None]        
         # print("AR Trans: ", transition)
-
         # Add action replay transition to layer's replay buffer
         self.replay_buffer.add(np.copy(transition))
 
@@ -165,10 +169,7 @@ class Layer():
         # [old state, hindsight action, reward = None, next state, goal = None, finished = None, 
         # next state projeted to subgoal/end goal space]
 
-        if self.is_top_layer:
-            hindsight_goal = env.project_state_to_endgoal(env.sim, next_state)
-        else:
-            hindsight_goal = env.project_state_to_subgoal(env.sim, next_state)
+        hindsight_goal = env.project_state_to_subgoal(env.sim, next_state)
 
         transition = [self.current_state, hindsight_action, None, next_state, None, None, hindsight_goal]
         
@@ -253,7 +254,10 @@ class Layer():
     # Create transition penalizing subgoal if necessary.  The target Q-value when this transition is used will ignore next state as the finished boolena = True.  Change the finished boolean to False, if you would like the subgoal penalty to depend on the next state.
     def penalize_subgoal(self, subgoal, next_state, high_level_goal_achieved):
         
-        transition = [self.current_state, subgoal, self.subgoal_penalty, next_state, self.goal, True, None]
+        if self.is_top_layer:
+            transition = [self.current_state, subgoal, self.subgoal_penalty, next_state, True, None]
+        else:
+            transition = [self.current_state, subgoal, self.subgoal_penalty, next_state, self.goal, True, None]
 
         self.replay_buffer.add(np.copy(transition))
 
@@ -269,7 +273,10 @@ class Layer():
         # NOTE: during testing, highest level will continue to ouput subgoals until either 
         # (i) the maximum number of episdoe time steps or (ii) the end goal has been achieved.
 
-        # Return to previous level when any higher level goal achieved. 
+        # Return to previous level when any higher level goal achieved.
+        if env.done:
+            return True
+
         if max_lay_achieved is not None and max_lay_achieved >= self.layer_number:
             return True
 
@@ -295,7 +302,8 @@ class Layer():
         # print("\nTraining Layer %d" % self.layer_number)
 
         # Set layer's current state and new goal state
-        self.goal = agent.goal_array[self.layer_number]
+        if not self.is_top_layer:
+            self.goal = agent.goal_array[self.layer_number]
         self.current_state = agent.current_state
 
         # Reset flag indicating whether layer has ran out of attempts.  This will be used for subgoal testing.
@@ -365,8 +373,10 @@ class Layer():
                         agent.subgoal_achieved_info[self.layer_number][0] += 1
 
                 logging.info(f"\nEpisode {episode_num}, Layer {self.layer_number}, Attempt {attempts_made} Goal Achieved Goal {self.goal}")
-                logging.info(f"Goal: {self.goal}")
-                logging.info(f"Hindsight Goal: {env.project_state_to_subgoal(env.sim, agent.current_state)}")
+
+                if not self.is_top_layer:
+                    logging.info(f"Goal: {self.goal}")
+                    logging.info(f"Hindsight Goal: {env.project_state_to_subgoal(env.sim, agent.current_state)}")
 
             # Perform hindsight learning using action actually executed (low-level action or hindsight subgoal)
             if self.layer_number == 0:
@@ -384,10 +394,11 @@ class Layer():
             if not agent.args.test:
 
                 # Create action replay transition by evaluating hindsight action given current goal
-                self.perform_action_replay(hindsight_action, agent.current_state, goal_status)
+                self.perform_action_replay(hindsight_action, agent.current_state, goal_status, env)
 
                 # Create preliminary goal replay transitions.  The goal and reward in these transitions will be finalized when this layer has run out of attempts or the goal has been achieved.
-                self.create_prelim_goal_replay_trans(hindsight_action, agent.current_state, env, agent.args.n_layers)
+                if not self.is_top_layer:
+                    self.create_prelim_goal_replay_trans(hindsight_action, agent.current_state, env, agent.args.n_layers)
 
 
                 # Penalize subgoals if subgoal testing and subgoal was missed by lower layers after maximum number of attempts
@@ -419,7 +430,7 @@ class Layer():
 
             # Return to previous level to receive next subgoal if applicable
             # if self.return_to_higher_level(max_lay_achieved, agent, env, attempts_made):
-            if (max_lay_achieved is not None and max_lay_achieved >= self.layer_number) or agent.steps_taken >= env.max_actions or attempts_made >= self.time_limit:
+            if (env.done or max_lay_achieved is not None and max_lay_achieved >= self.layer_number) or agent.steps_taken >= env.max_actions or attempts_made >= self.time_limit:
 
                 if self.layer_number == agent.args.n_layers-1:
                     logging.info("HL Attempts Made: %d", attempts_made)
@@ -431,12 +442,9 @@ class Layer():
 
                 # If not testing, finish goal replay by filling in missing goal and reward values before returning to prior level.
                 if not agent.args.test:
-                    if self.is_top_layer:
-                        goal_thresholds = env.endgoal_thresholds
-                    else:
+                    if not self.is_top_layer:
                         goal_thresholds = env.subgoal_thresholds
-
-                    self.finalize_goal_replay(goal_thresholds)
+                        self.finalize_goal_replay(goal_thresholds)
 
                 # Under certain circumstances, the highest layer will not seek a new end goal
                 if self.return_to_higher_level(max_lay_achieved, agent, env, attempts_made):

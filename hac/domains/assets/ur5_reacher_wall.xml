@@ -5,7 +5,7 @@
     <size njmax="550" nconmax="150" />
     <default class="all">
         <joint damping="1" />
-        <geom condim="4" solref="0.01 1" solimp="0.99 0.99 0.01" />
+        <geom condim="4" solref="0.01 1" solimp="0.99 0.99 0.01" friction="0.01" />
     </default>
     <asset>
         <mesh name="v_base" file="v_base.stl" />
@@ -134,43 +134,59 @@
         <!-- End goal and subgoal Visualizations -->
 
         <!-- End Goal: Yellow -->
-        <body name="end_goal_upper_arm" pos="0 0 0" mocap="true">
+        <!-- <body name="end_goal_upper_arm" pos="0 0 0" mocap="true">
             <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.5" />
         </body>
 
         <body name="end_goal_forearm" pos="0 0 0" mocap="true">
             <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.5" />
+        </body> -->
+
+        <!-- <body name="end_goal_wrist" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.0" />
+        </body> -->
+
+        <body name="end_goal_region" pos="0.8 -0.4 0.8" mocap="true">
+            <site type="sphere" size="0.2" rgba="1 1 0 0.2" />
         </body>
 
-        <body name="end_goal_wrist" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.5" />
+        <!-- Subgoal 1: Switch -->
+        <!-- <body name="switch_wrist_1" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0.0" />
+        </body> -->
+
+        <body name="wall" pos="0.8 0.0 0.0">
+            <geom name="wall" rgba="1 0 0 1" type="box" size="0.5 0.1 0.7"/>
         </body>
 
+        <body name="switch_region" pos="0.5 0.5 0.5" mocap="true">
+            <site type="sphere" size="0.2" rgba="0 0 1 0.2" />
+        </body>
 
-        <!-- Subgoal 1: Purple -->
+        <!-- Subgoal 1: Green -->
         <body name="subgoal_1_upper_arm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0.5" />
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
         </body>
 
         <body name="subgoal_1_forearm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0.5" />
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
         </body>
 
         <body name="subgoal_1_wrist_1" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0.5" />
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
         </body>
 
-        <!-- Subgoal 2: Green -->
+        <!-- Display joint positions: Green -->
         <body name="subgoal_2_upper_arm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
         </body>
 
         <body name="subgoal_2_forearm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
         </body>
 
         <body name="subgoal_2_wrist_1" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
         </body>
 
         <!-- Subgoal 3: Red -->

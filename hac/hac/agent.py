@@ -55,7 +55,6 @@ class Agent():
 
         # Project current state onto the subgoal and end goal spaces
         proj_subgoal = env.project_state_to_subgoal(env.sim, self.current_state)
-        proj_endgoal = env.project_state_to_endgoal(env.sim, self.current_state)
 
         for i in range(self.args.n_layers):
 
@@ -63,14 +62,7 @@ class Agent():
 
             # If at highest layer, compare to end goal threshold
             if i == self.args.n_layers - 1:
-                # Check dimensions are appropriate         
-                assert len(proj_endgoal) == len(self.goal_array[i]) == len(env.endgoal_thresholds), "Projected end goal, actual end goal, and end goal thresholds should have same dimensions"
-
-                # Check whether layer i's goal was achieved by checking whether projected state is within the goal achievement threshold
-                for j in range(len(proj_endgoal)):
-                    if np.absolute(self.goal_array[i][j] - proj_endgoal[j]) > env.endgoal_thresholds[j]:
-                        goal_achieved = False
-                        break
+                goal_achieved = env.solved
 
             # If not highest layer, compare to subgoal thresholds
             else:
@@ -126,17 +118,7 @@ class Agent():
     # Train agent for an episode
     def train(self, env, episode_num, total_episodes):
 
-        # Select final goal from final goal space
-        self.goal_array[self.args.n_layers - 1] = env.get_next_goal(self.args.test)
-        logging.info(f"Next End Goal: {self.goal_array[self.args.n_layers - 1]}")
-
-        # Select initial state from in initial state space
-        if self.args.env in ['hac-ant-four-rooms-v0', 'hac-ant-reacher-v0']:
-            next_goal = self.goal_array[self.args.n_layers - 1]
-        else:
-            next_goal = None
-
-        self.current_state = env.reset(next_goal)
+        self.current_state = env.reset()
         # print("Initial State: ", self.current_state)
 
         # Reset step counter

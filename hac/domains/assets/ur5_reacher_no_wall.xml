@@ -5,7 +5,7 @@
     <size njmax="550" nconmax="150" />
     <default class="all">
         <joint damping="1" />
-        <geom condim="4" solref="0.01 1" solimp="0.99 0.99 0.01" />
+        <geom condim="4" solref="0.01 1" solimp="0.99 0.99 0.01" friction="0.01" />
     </default>
     <asset>
         <mesh name="v_base" file="v_base.stl" />
@@ -34,7 +34,7 @@
         <mesh name="outer_finger_coarse" file="outer_finger_coarse.stl" />
     </asset>
     <worldbody>
-        <geom name="bottom_plane" size="5 5 0.1" type="plane" />
+        <geom name="bottom_plane" size="5 5 0.1" type="plane"/>
         <camera name="main" pos="0 1.5 1" quat="1.22206e-06 -5.16678e-07 0.389418 0.921061" />
         <light name="light1" pos="0 -0.25 3" dir="0 0 -1" directional="true" />
         <light name="light2" pos="0 0.25 3" dir="0 0 -1" directional="true" />
@@ -134,84 +134,100 @@
         <!-- End goal and subgoal Visualizations -->
 
         <!-- End Goal: Yellow -->
-        <body name="end_goal_upper_arm" pos="0 0 0" mocap="true">
+        <!-- <body name="end_goal_upper_arm" pos="0 0 0" mocap="true">
             <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.5" />
         </body>
 
         <body name="end_goal_forearm" pos="0 0 0" mocap="true">
             <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.5" />
+        </body> -->
+
+        <!-- <body name="end_goal_wrist" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.0" />
+        </body> -->
+
+        <body name="end_goal_region" pos="0.8 -0.4 0.8" mocap="true">
+            <site type="sphere" size="0.2" rgba="1 1 0 0.2" />
         </body>
 
-        <body name="end_goal_wrist" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 1 0 0.5" />
+        <!-- Subgoal 1: Switch -->
+        <!-- <body name="switch_wrist_1" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0.0" />
+        </body> -->
+
+        <!-- <body name="door" pos="0.8 0.0 0.0">
+            <geom name="door" rgba="1 0 0 1" type="box" size="0.5 0.1 0.7"/>
+        </body> -->
+
+        <body name="switch_region" pos="0.5 0.5 0.5" mocap="true">
+            <site type="sphere" size="0.2" rgba="0 0 1 0.2" />
         </body>
 
-
-        <!-- Subgoal 1: Purple -->
+        <!-- Subgoal 1: Green -->
         <body name="subgoal_1_upper_arm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0" />
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
         </body>
 
         <body name="subgoal_1_forearm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0" />
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
         </body>
 
         <body name="subgoal_1_wrist_1" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="1 0 1 0" />
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
         </body>
 
-        <!-- Subgoal 2: Green -->
+        <!-- Display joint positions: Green -->
         <body name="subgoal_2_upper_arm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0" />
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
         </body>
 
         <body name="subgoal_2_forearm" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0" />
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
         </body>
 
         <body name="subgoal_2_wrist_1" pos="0 0 0" mocap="true">
-            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0" />
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
         </body>
 
         <!-- Subgoal 3: Red -->
-        <body name="subgoal_3" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_3" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="1 0 0 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 4: Blue -->
-        <body name="subgoal_4" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_4" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="0 0 1 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 5: Cyan -->
-        <body name="subgoal_5" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_5" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="0 1 1 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 6: Orange -->
-        <body name="subgoal_6" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_6" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="1 0.65 0 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 7: Maroon -->
-        <body name="subgoal_7" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_7" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="0.5 0 0 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 8: Gray -->
-        <body name="subgoal_8" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_8" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="0.5 0.5 0.5 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 9: White -->
-        <body name="subgoal_9" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_9" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="1 1 1 0" />
-        </body>
+        </body> -->
 
         <!-- Subgoal 10: Black -->
-        <body name="subgoal_10" pos="0 0 0" mocap="true">
+        <!-- <body name="subgoal_10" pos="0 0 0" mocap="true">
             <site type="box" size="0.08 0.08 0.08" rgba="0 0 0 0" />
-        </body>
+        </body> -->
 
     </worldbody>
     <actuator>

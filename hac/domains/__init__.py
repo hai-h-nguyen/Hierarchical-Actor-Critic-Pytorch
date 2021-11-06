@@ -1,26 +1,21 @@
 from gym.envs.registration import register
 
 register(
-    id='hac-inverted-pendulum-v0',
-    entry_point='hac.domains.inverted_pendulum:InvertedPendulumEnv',
+    id='hac-car-flag-v0',
+    entry_point='hac.domains.car_flag:CarEnv',
 )
 
 register(
-    id='hac-mountain-car-v0',
-    entry_point='hac.domains.mountain_car:MountainCarEnv',
+    id='hac-two-boxes-check-v0',
+    entry_point='hac.domains.two_boxes_check:BoxEnv',
 )
 
 register(
-    id='hac-ur5-reacher-v0',
-    entry_point='hac.domains.ur5_reacher:UR5Env',
+    id='hac-ant-heaven-hell-v0',
+    entry_point='hac.domains.ant_heaven_hell:AntEnv',
 )
 
 register(
-    id='hac-ant-four-rooms-v0',
-    entry_point='hac.domains.ant_four_rooms:AntFourRoomsEnv',
-)
-
-register(
-    id='hac-ant-reacher-v0',
-    entry_point='hac.domains.ant_reacher:AntReacherEnv',
+    id='hac-ant-tag-v0',
+    entry_point='hac.domains.ant_tag:AntTagEnv',
 )
