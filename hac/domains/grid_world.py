@@ -3,10 +3,23 @@ import time
 import numpy as np
 import gym
 from gym import spaces
+from gym.utils import seeding
 
 class Grid_World(gym.Env):
 
-    def __init__(self):
+    def __init__(self, args=None, seed=0, max_actions=100, show=False):
+
+        if args.n_layers in [2]:
+            args.time_scale = 5
+            max_actions = 50
+
+        # functions to project state to goal
+        project_state_to_endgoal = lambda state: state
+        project_state_to_subgoal = lambda state: state
+
+        self.name = 'Grid-World'
+
+        self.visualize = show
 
         world_len = 11
         state_mat = np.ones((world_len,world_len))
@@ -22,12 +35,13 @@ class Grid_World(gym.Env):
         self.goal = goal_row * state_mat.shape[1] + goal_col
 
         # Create top-level window
-        self.root = Tk()
-        self.root.title("Grid World")
+        if self.visualize:
+            self.root = Tk()
+            self.root.title("Grid World")
 
-        # Create canvas to hold grid world
-        self.canvas = Canvas(self.root,width = "500",height = "500")
-        self.canvas.grid(column=0, row=0, sticky=(N, W, E, S))
+            # Create canvas to hold grid world
+            self.canvas = Canvas(self.root,width = "500",height = "500")
+            self.canvas.grid(column=0, row=0, sticky=(N, W, E, S))
 
         # Create grid world
         self.state_mat = state_mat 
@@ -57,12 +71,52 @@ class Grid_World(gym.Env):
                     color = "white"
                 else:
                     color = "black"
-                    
-                self.canvas.create_rectangle(x_1,y_1,x_2,y_2,fill=color)
-        
+                
+                if self.visualize:
+                    self.canvas.create_rectangle(x_1,y_1,x_2,y_2,fill=color)
+
+        self.steps_cnt = 0
+
+        # Configs for agent
+        agent_params = {}
+        agent_params["subgoal_test_perc"] = 0.3
+        agent_params["subgoal_penalty"] = -args.time_scale
+        agent_params["random_action_perc"] = 0.3
+
+
+        agent_params["num_pre_training_episodes"] = -1
+        agent_params["episodes_to_store"] = 500
+        agent_params["num_exploration_episodes"] = 100
+
+        self.agent_params = agent_params
+
+        self.action_size = 4
+        self.state_dim = 1
+        self.endgoal_dim = 1
+        self.subgoal_dim = 1
+
+        self.project_state_to_endgoal = project_state_to_endgoal
+        self.project_state_to_subgoal = project_state_to_subgoal
+
+        self.max_actions = max_actions
+        self.old_subgoal_1 = -1
+        self.endgoal_1 = -1
+
+    def seed(self, seed=None):
+        self.np_random, seed_ = seeding.np_random(seed)
+        return [seed_]
+
+    def get_next_goal(self, test):
+        """
+        Randomize the position of the goal (the agent starts at a fixed location)
+        """
+        return self.goal
+
+
     def reset(self):
 
         self.state = 0
+        self.steps_cnt = 0
 
         # Reset blocks to original colors
         for i in range(self.state_mat.shape[0]):
@@ -75,67 +129,73 @@ class Grid_World(gym.Env):
 
                 id_num = i * len(self.state_mat[0]) + j + 1
                     
-                self.canvas.itemconfig(id_num,fill=color)
+                if self.visualize:
+                    self.canvas.itemconfig(id_num,fill=color)
+        
+        if self.visualize:
+            # Change color of agent's current state and goal state
+            self.canvas.itemconfig(self.state + 1, fill="blue")
+            self.canvas.itemconfig(self.goal + 1, fill="yellow")
 
-        # Change color of agent's current state and goal state
-        self.canvas.itemconfig(self.state + 1, fill="blue")
-        self.canvas.itemconfig(self.goal + 1, fill="yellow")
-
-        self.root.update()
-        # time.sleep(0.1)
+            self.root.update()
+            time.sleep(0.1)
 
         return self.get_state()
 
-        
+    def display_subgoals(self, subgoals):
 
+        state = self.state
 
-    def display_subgoals(self, subgoal_1, old_subgoal_1, state, goal):
-   
-        if subgoal_1 != old_subgoal_1:
-            if old_subgoal_1 != -1:
+        if subgoals[0] != self.old_subgoal_1:
+            if self.old_subgoal_1 != -1:
                 # If agent currently at old subgoal
-                if old_subgoal_1 == state:
-                    self.canvas.itemconfig(old_subgoal_1 + 1,fill="blue")
-                elif old_subgoal_1 == goal:
-                    self.canvas.itemconfig(old_subgoal_1 + 1,fill="yellow")
+                if self.old_subgoal_1 == state:
+                    self.canvas.itemconfig(self.old_subgoal_1 + 1,fill="blue")
+                # If at the end-goal, then paint the goal yellow
+                elif self.old_subgoal_1 == self.goal:
+                    self.canvas.itemconfig(self.old_subgoal_1 + 1,fill="yellow")
+                # Remove the color of the last subgoal
                 else:
-                    self.canvas.itemconfig(old_subgoal_1 + 1,fill="white")  
+                    self.canvas.itemconfig(self.old_subgoal_1 + 1,fill="white")  
                                        
-            
-            self.canvas.itemconfig(subgoal_1 + 1,fill="magenta") 
+            # print(self.old_subgoal_1)
+            self.canvas.itemconfig(subgoals[0] + 1,fill="magenta") 
             self.root.update()
+
+        self.old_subgoal_1 = subgoals[0]
         time.sleep(0.1)
 
-            # 
 
     def step(self, action):
 
         old_state = np.copy(self.state)
         new_state = self.get_next_state(action)
 
+        self.steps_cnt += 1
+
         reward = -1.0
 
-        # If state has changed, update blocks colors
-        if new_state != old_state:
-            self.canvas.itemconfig(old_state + 1,fill="white") 
-        
-        if new_state != self.goal:            
-            self.canvas.itemconfig(new_state + 1,fill="blue")
-        else:
-            self.canvas.itemconfig(new_state + 1,fill="orange")
-            reward = 0.0
+        if self.visualize:
+            # If state has changed, update blocks colors
+            if new_state != old_state:
+                self.canvas.itemconfig(old_state + 1,fill="white") 
+            
+            if new_state != self.goal:            
+                self.canvas.itemconfig(new_state + 1,fill="blue")
+            else:
+                self.canvas.itemconfig(new_state + 1,fill="orange")
+                reward = 0.0
 
-        self.root.update()
+            self.root.update()
 
-        # time.sleep(0.2)
+            time.sleep(0.1)
 
         self.state = new_state
 
-        # TODO: return correctly
         return self.get_state(), reward, False, {}
 
     def get_state(self):
-        return self.state / 121.0
+        return self.state
 
     def get_next_state(self, action):
 
