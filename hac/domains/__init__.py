@@ -19,3 +19,8 @@ register(
     id='hac-ant-tag-v0',
     entry_point='hac.domains.ant_tag:AntTagEnv',
 )
+
+register(
+    id='hac-door-push-v0',
+    entry_point='hac.domains.door_push:DoorEnv',
+)

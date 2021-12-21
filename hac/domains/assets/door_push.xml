@@ -1,0 +1,199 @@
+<mujoco model="ur5">
+    <compiler angle="radian" meshdir="muj_gripper/" />
+    <option impratio="5" tolerance="1e-10" cone="elliptic"/>
+    <!--option impratio="5" tolerance="1e-10" noslip_tolerance="0" noslip_iterations="200" /-->
+    <size njmax="550" nconmax="150" />
+    <default class="all">
+        <joint damping="1" />
+        <geom condim="4" solref="0.01 1" solimp="0.99 0.99 0.01" />
+    </default>
+    <asset>
+        <mesh name="v_base" file="v_base.stl" />
+        <mesh name="c_base" file="c_base.stl" />
+        <mesh name="v_shoulder" file="v_shoulder.stl" />
+        <mesh name="c_shoulder" file="c_shoulder.stl" />
+        <mesh name="v_upperarm" file="v_upperarm.stl" />
+        <mesh name="c_upperarm" file="c_upperarm.stl" />
+        <mesh name="v_forearm" file="v_forearm.stl" />
+        <mesh name="c_forearm" file="c_forearm.stl" />
+        <mesh name="v_wrist1" file="v_wrist1.stl" />
+        <mesh name="c_wrist1" file="c_wrist1.stl" />
+        <mesh name="v_wrist2" file="v_wrist2.stl" />
+        <mesh name="c_wrist2" file="c_wrist2.stl" />
+        <mesh name="v_wrist3" file="v_wrist3.stl" />
+        <mesh name="c_wrist3" file="c_wrist3.stl" />
+        <mesh name="robotiq_85_base_link_fine" file="robotiq_85_base_link_fine.stl" />
+        <mesh name="robotiq_85_base_link_coarse" file="robotiq_85_base_link_coarse.stl" />
+        <mesh name="inner_knuckle_fine" file="inner_knuckle_fine.stl" />
+        <mesh name="inner_knuckle_coarse" file="inner_knuckle_coarse.stl" />
+        <mesh name="inner_finger_fine" file="inner_finger_fine.stl" />
+        <mesh name="inner_finger_coarse" file="inner_finger_coarse.stl" />
+        <mesh name="outer_knuckle_fine" file="outer_knuckle_fine.stl" />
+        <mesh name="outer_knuckle_coarse" file="outer_knuckle_coarse.stl" />
+        <mesh name="outer_finger_fine" file="outer_finger_fine.stl" />
+        <mesh name="outer_finger_coarse" file="outer_finger_coarse.stl" />
+        <texture file="blue.png" type="cube" name="blue-wood" />
+        <texture file="green.png" type="cube" name="green-wood" />
+        <material name="MatBlueWood" texture="blue-wood" texrepeat="3 3" specular="0.4" shininess="0.1" />
+        <material name="MatGreenWood" texture="green-wood" texrepeat="3 3" specular="0.4" shininess="0.1" />
+
+    </asset>
+    <worldbody>
+
+      <body>
+        <body name="g-door-1-pull">
+          <body name="frameg1" pos="-0.0 0.4 0.8" quat="0.5 -0.5 0.5 0.5">
+              <inertial pos="0.3 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />
+              <geom size="0.03 0.1" pos="0.045 0 0" type="cylinder" rgba="1 1 1 1" group="1" name="l_frame_g1"/>
+              <body name="doorg1" pos="0.3 0 0">
+                  <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="2.43455" diaginertia="0.0913751 0.0521615 0.043714" />
+                  <joint name="hingeg1" pos="-0.255 0 0" axis="0 0 1" range="-1.0 0.0" damping="1" frictionloss="0" limited="true"/>
+                  <geom size="0.22 0.02 .1" type="box" friction="1 1 1" group="1" name="panelg1" material="MatGreenWood"/>
+              </body>
+          </body>
+        </body>
+
+        <!-- <body name="g-door-2-pull">
+          <body name="frameg2" pos="-0.0 -0.4 0.8" quat="0.5 -0.5 0.5 0.5">
+              <inertial pos="0.3 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />
+              <geom size="0.03 0.1" pos="0.045 0 0" type="cylinder" rgba="1 1 1 1" group="1" name="l_frame_g2"/>
+              <body name="doorg2" pos="0.3 0 0">
+                  <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="2.43455" diaginertia="0.0913751 0.0521615 0.043714" />
+                  <joint name="hingeg2" pos="-0.255 0 0" axis="0 0 1" range="-1.0 0.0" damping="1" frictionloss="0" limited="true"/>
+                  <geom size="0.22 0.02 .1" type="box" friction="1 1 1" group="1" name="panelg2" material="MatGreenWood"/>
+              </body>
+          </body>
+        </body> -->
+
+        <body name="b-door-1-push">
+          <body name="frameb1" pos="-0.0 0.8 0.8" quat="0.5 -0.5 0.5 0.5">
+              <inertial pos="0.3 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />
+              <geom size="0.03 0.1" pos="0.045 0 0" type="cylinder" rgba="1 1 1 1" group="1" name="l_frame_b1"/>
+              <body name="doorb1" pos="0.3 0 0">
+                  <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="2.43455" diaginertia="0.0913751 0.0521615 0.043714" />
+                  <joint name="hingeb1" pos="-0.255 0 0" axis="0 0 1" range="0.0 1.0" damping="1" frictionloss="0" limited="true"/>
+                  <geom size="0.22 0.02 .1" type="box" friction="1 1 1" group="1" name="panelb1" material="MatBlueWood"/>
+              </body>
+          </body>
+        </body>
+
+        <!-- <body name="b-door-2-push">
+          <body name="frameb2" pos="-0.0 -0.8 0.8" quat="0.5 -0.5 0.5 0.5">
+              <inertial pos="0.3 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />
+              <geom size="0.03 0.1" pos="0.045 0 0" type="cylinder" rgba="1 1 1 1" group="1" name="l_frame_b2"/>
+              <body name="doorb2" pos="0.3 0 0">
+                  <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="2.43455" diaginertia="0.0913751 0.0521615 0.043714" />
+                  <joint name="hingeb2" pos="-0.255 0 0" axis="0 0 1" range="0.0 1.0" damping="1" frictionloss="0" limited="true"/>
+                  <geom size="0.22 0.02 .1" type="box" friction="1 1 1" group="1" name="panelb2" material="MatBlueWood"/>
+              </body>
+          </body>
+        </body> -->
+
+        <site name="bottom_site" pos="0 0 -0.3" rgba="0 0 0 0" size="0.005"/>
+        <site name="top_site" pos="0 0 0.3" rgba="0 0 0 0" size="0.005"/>
+        <site name="horizontal_radius_site" pos="0.3 0 0" rgba="0 0 0 0" size="0.1"/>
+      </body>
+
+        <geom name="bottom_plane" size="5 5 0.1" type="plane"/>
+        <camera name="main" pos="0 1.5 1" quat="1.22206e-06 -5.16678e-07 0.389418 0.921061" />
+        <light name="light1" pos="0 -0.25 3" dir="0 0 -1" directional="true" />
+        <light name="light2" pos="0 0.25 3" dir="0 0 -1" directional="true" />
+        <body name="base_link" childclass="all" pos="0 0 0">
+            <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass="4" diaginertia="0.0072 0.00443333 0.00443333" />
+            <geom name="v_base_link" type="mesh" contype="0" conaffinity="0" group="1" mesh="v_base" />
+            <geom name="c_base_link" type="mesh" mesh="c_base" />
+            <body name="shoulder_link" pos="0 0 0.089159">
+                <inertial pos="0 0 0" mass="3.7" diaginertia="0.0102675 0.0102675 0.00666" />
+                <joint name="shoulder_pan_joint" pos="0 0 0" axis="0 0 1" damping="10" />
+                <geom name="v_shoulder_link" type="mesh" contype="0" conaffinity="0" group="1"  mesh="v_shoulder" />
+                <geom name="c_shoulder_link" type="mesh" mesh="c_shoulder" />
+                <body name="upper_arm_link" pos="0 0.13585 0" quat="0.707107 0 0.707107 0">
+                    <inertial pos="0 0 0.28" mass="8.393" diaginertia="0.226891 0.226891 0.0151074" />
+                    <joint name="shoulder_lift_joint" pos="0 0 0" axis="0 1 0" damping="10" />
+                    <geom name="v_upper_arm_link" type="mesh" contype="0" conaffinity="0" group="1" mesh="v_upperarm" />
+                    <geom name="c_upper_arm_link" type="mesh" mesh="c_upperarm" />
+                    <body name="forearm_link" pos="0 -0.1197 0.425">
+                        <inertial pos="0 0 0.25" mass="2.275" diaginertia="0.0494433 0.0494433 0.004095" />
+                        <joint name="elbow_joint" pos="0 0 0" axis="0 1 0" damping="10" />
+                        <geom name="v_forearm_link" type="mesh" contype="0" conaffinity="0" group="1" mesh="v_forearm" />
+                        <geom name="c_forearm_link" type="mesh" mesh="c_forearm" />
+                    </body>
+                </body>
+            </body>
+        </body>
+
+        <!-- End goal and subgoal Visualizations -->
+
+        <!-- Subgoal 1: Green -->
+        <body name="subgoal_1_upper_arm" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
+        </body>
+
+        <body name="subgoal_1_forearm" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
+        </body>
+
+        <body name="subgoal_1_wrist_1" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="0 1 0 0.5" />
+        </body>
+
+        <!-- Display joint positions: Green -->
+        <body name="subgoal_2_upper_arm" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
+        </body>
+
+        <body name="subgoal_2_forearm" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
+        </body>
+
+        <body name="subgoal_2_wrist_1" pos="0 0 0" mocap="true">
+            <site type="box" size="0.06 0.06 0.06" rgba="1 0 0 0.5" />
+        </body>
+
+        <!-- Subgoal 3: Red -->
+        <!-- <body name="subgoal_3" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="1 0 0 0" />
+        </body> -->
+
+        <!-- Subgoal 4: Blue -->
+        <!-- <body name="subgoal_4" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="0 0 1 0" />
+        </body> -->
+
+        <!-- Subgoal 5: Cyan -->
+        <!-- <body name="subgoal_5" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="0 1 1 0" />
+        </body> -->
+
+        <!-- Subgoal 6: Orange -->
+        <!-- <body name="subgoal_6" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="1 0.65 0 0" />
+        </body> -->
+
+        <!-- Subgoal 7: Maroon -->
+        <!-- <body name="subgoal_7" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="0.5 0 0 0" />
+        </body> -->
+
+        <!-- Subgoal 8: Gray -->
+        <!-- <body name="subgoal_8" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="0.5 0.5 0.5 0" />
+        </body> -->
+
+        <!-- Subgoal 9: White -->
+        <!-- <body name="subgoal_9" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="1 1 1 0" />
+        </body> -->
+
+        <!-- Subgoal 10: Black -->
+        <!-- <body name="subgoal_10" pos="0 0 0" mocap="true">
+            <site type="box" size="0.08 0.08 0.08" rgba="0 0 0 0" />
+        </body> -->
+
+    </worldbody>
+    <actuator>
+        <general name="shoulder_pan_joint" joint="shoulder_pan_joint" ctrllimited="true" forcelimited="true" ctrlrange="-3.15 3.15" forcerange="-150 150" biastype="affine" gainprm="10 0 0" biasprm="0 0 -10" />
+        <general name="shoulder_lift_joint" joint="shoulder_lift_joint" ctrllimited="true" forcelimited="true" ctrlrange="-5.0 5.0" forcerange="-150 150" biastype="affine" gainprm="10 0 0" biasprm="0 0 -10" />
+        <general name="elbow_joint" joint="elbow_joint" ctrllimited="true" forcelimited="true" ctrlrange="-3.15 3.15" forcerange="-150 150" biastype="affine" gainprm="10 0 0" biasprm="0 0 -10" />
+    </actuator>
+</mujoco>
