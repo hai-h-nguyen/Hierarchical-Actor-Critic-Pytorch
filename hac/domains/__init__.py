@@ -24,3 +24,8 @@ register(
     id='hac-ant-reacher-v0',
     entry_point='hac.domains.ant_reacher:AntReacherEnv',
 )
+
+register(
+    id='hac-peg-in-hole-v0',
+    entry_point='hac.domains.fetch.reach:FetchReachEnv',
+)
