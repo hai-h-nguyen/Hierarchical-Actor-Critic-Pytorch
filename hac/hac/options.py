@@ -63,6 +63,18 @@ def parse_options():
     )
 
     parser.add_argument(
+        '--noisy-obs',
+        action='store_true',
+        help='Noisy observation'
+    )
+
+    parser.add_argument(
+        '--random-act',
+        action='store_true',
+        help='Random action with some probability'
+    )  
+
+    parser.add_argument(
         '--n_layers',
         type=int,
         default=2,
